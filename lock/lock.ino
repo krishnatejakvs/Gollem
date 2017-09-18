@@ -3,13 +3,13 @@
 #include <Servo.h>
 BLEPeripheral blePeripheral; //peripheral device
 
-BLEService LockService("19b10000-e8f2-537e4f6c-d104768a1214"); //Ble service UUID
+BLEService LockService("19b10000-e8f2-537e-4f6c-d104768a1214"); //Ble service UUID
 
-BLEUnsignedCharCharacteristic LockCharacteristic("19b10001-e8f2-537e4f6c-d104768a1214", BLERead | BLENotify | BLEWrite); //Lock state characteristic UUID 
+BLEUnsignedCharCharacteristic LockCharacteristic("19b10001-e8f2-537e-4f6c-d104768a1214", BLERead | BLENotify | BLEWrite); //Lock state characteristic UUID 
 
-BLEUnsignedCharCharacteristic CalibCharacteristic("19b10002-e8f2-537e4f6c-d104768a1214", BLEWrite); //Lock Calibration
+BLEUnsignedCharCharacteristic CalibCharacteristic("19b10002-e8f2-537e-4f6c-d104768a1214", BLEWrite); //Lock Calibration
 
-BLEUnsignedCharCharacteristic AutoUnlockCharacteristic("19b10003-e8f2-537e4f6c-d104768a1214",BLERead | BLEWrite); //Auto unlock time
+BLEUnsignedCharCharacteristic AutoUnlockCharacteristic("19b10003-e8f2-537e-4f6c-d104768a1214",BLERead | BLEWrite); //Auto unlock time
 
 Servo myservo;  // create servo object to control a servo
 const int ledpin=13;
