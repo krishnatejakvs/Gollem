@@ -1,6 +1,8 @@
 #include <CurieBLE.h>
 #include <EEPROM.h>
 #include <Servo.h>
+#define CALIB_MIN 35
+#define CALIB_MAX 780
 BLEPeripheral blePeripheral; //peripheral device
 
 BLEService LockService("19b10000-e8f2-537e-4f6c-d104768a1214"); //Ble service UUID
@@ -18,15 +20,15 @@ unsigned char LockState=0;//lock variable
 
 unsigned int LockingValue=0, UnLockingValue=0;
 unsigned int sensorValue=0, sensorLevel=0;
+uint8_t angle;
 long previousMillis = 0;
 long Unlocktime=655350;
+  
 
 void setup()
 {
   Serial.begin(9600);
   pinMode(ledpin,OUTPUT);
-
-  myservo.attach(9); //servo connected on pin 9
 
   LockingValue=EEPROM.read(0);
   UnLockingValue=EEPROM.read(2);
@@ -61,17 +63,18 @@ void setup()
  void loop()
  {
     blePeripheral.poll(); 
+    //myservo.detach();
 
-    sensorValue = analogRead(A0);
+   /* sensorValue = analogRead(A0);
     sensorLevel = map(sensorValue, 0, 1023, 0, 180); 
 
-    long currentMillis = millis(); 
+   long currentMillis = millis(); 
     if (LockState ==1 && currentMillis - previousMillis >=Unlocktime) { 
         Lockclose(); 
         LockCharacteristic.setValue(LockState+'0');
         Serial.println(LockState);
     }
-   /* sensorLevel=updateLockStuatus();
+    sensorLevel=updateLockStuatus();
     if(LockingValue>UnLockingValue){
       if((sensorLevel -((LockingValue + UnLockingValue)/2))>=0){
           LockState=0;
@@ -138,41 +141,54 @@ void AutoUnlockCharacteristicWritten(BLECentral& central, BLECharacteristic& cha
 
 void updateLockLevel(){
   sensorValue = analogRead(A0); 
-  sensorLevel = map(sensorValue, 0, 1023, 0, 180);
-  Serial.print("sensor value is ");
-  Serial.println(sensorLevel);
-  EEPROM.write(0, sensorLevel); 
+  if (sensorValue < CALIB_MIN) sensorValue = CALIB_MIN;
+  if (sensorValue > CALIB_MAX) sensorValue = CALIB_MAX;
+  sensorLevel = map(sensorValue, CALIB_MIN, CALIB_MAX, 0, 254);
+  angle = map(sensorLevel,0,254,0,180);
+  Serial.print("sensor value is "); 
+  Serial.println(angle);
+  EEPROM.write(0, angle);
   LockingValue=EEPROM.read(0);
   Serial.println(LockingValue);
  }
 void updateUnlockLevel(){
   sensorValue = analogRead(A0); 
-  sensorLevel = map(sensorValue, 0, 1023, 0, 180);
+   if (sensorValue < CALIB_MIN) sensorValue = CALIB_MIN;
+  if (sensorValue > CALIB_MAX) sensorValue = CALIB_MAX;
+  sensorLevel = map(sensorValue, CALIB_MIN, CALIB_MAX, 0, 254);
+  angle = map(sensorLevel,0,254,0,180);
   Serial.print("sensor value is "); 
-  Serial.println(sensorLevel);
-  EEPROM.write(2, sensorLevel);
+  Serial.println(angle);
+  EEPROM.write(2, angle);
   UnLockingValue=EEPROM.read(2);
   Serial.println(UnLockingValue);
  }
 
-unsigned int updateLockStuatus(){
+uint8_t updateLockStuatus(){
   sensorValue = analogRead(A0); 
-  sensorLevel = map(sensorValue, 0, 1023, 0, 180);
-  return sensorLevel;
+  sensorLevel = map(sensorValue, CALIB_MIN, CALIB_MAX, 0, 254);
+  angle = map(sensorLevel,0,254,0,180);
+  return angle;
 }
 
 void Lockclose(){
+  myservo.attach(9); //servo connected on pin 9
+  delay(50);
   Serial.println("Lock closed");
   myservo.write(LockingValue); 
   LockState=0;
-  delay(15);
-}
+  delay(50);
+ // myservo.detach();
+ }
 void Lockopen(){
+  myservo.attach(9); //servo connected on pin 9
+  delay(50);
   Serial.println("Lock opened");
   previousMillis = millis();
   myservo.write(UnLockingValue);
   LockState=1; 
-  delay(15);
+  delay(50);
+ // myservo.detach();
 }
 
 
