@@ -22,7 +22,7 @@ unsigned int LockingValue=0, UnLockingValue=0;
 unsigned int sensorValue=0, sensorLevel=0;
 uint8_t angle;
 long previousMillis = 0;
-long Unlocktime=1000;
+long Unlocktime=655350;
   
 
 void setup()
@@ -63,20 +63,18 @@ void setup()
  void loop()
  {
     blePeripheral.poll();
-    long currentMillis = millis(); 
-    if (currentMillis - previousMillis >=Unlocktime) { 
+     long currentMillis = millis(); 
+    if (currentMillis - previousMillis >=1000) { 
           myservo.detach(); 
     }
 
-   /* sensorValue = analogRead(A0);
-    sensorLevel = map(sensorValue, 0, 1023, 0, 180); 
-
-   long currentMillis = millis(); 
     if (LockState ==1 && currentMillis - previousMillis >=Unlocktime) { 
         Lockclose(); 
         LockCharacteristic.setValue(LockState+'0');
         Serial.println(LockState);
     }
+  /*  sensorValue = analogRead(A0);
+    sensorLevel = map(sensorValue, 0, 1023, 0, 180);
     sensorLevel=updateLockStuatus();
     if(LockingValue>UnLockingValue){
       if((sensorLevel -((LockingValue + UnLockingValue)/2))>=0){
