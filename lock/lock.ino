@@ -22,7 +22,7 @@ unsigned int LockingValue=0, UnLockingValue=0;
 unsigned int sensorValue=0, sensorLevel=0;
 uint8_t angle;
 long previousMillis = 0;
-long Unlocktime=655350;
+long Unlocktime=1000;
   
 
 void setup()
@@ -62,8 +62,11 @@ void setup()
  }
  void loop()
  {
-    blePeripheral.poll(); 
-    //myservo.detach();
+    blePeripheral.poll();
+    long currentMillis = millis(); 
+    if (currentMillis - previousMillis >=Unlocktime) { 
+          myservo.detach(); 
+    }
 
    /* sensorValue = analogRead(A0);
     sensorLevel = map(sensorValue, 0, 1023, 0, 180); 
@@ -173,22 +176,19 @@ uint8_t updateLockStuatus(){
 
 void Lockclose(){
   myservo.attach(9); //servo connected on pin 9
-  delay(50);
   Serial.println("Lock closed");
+  previousMillis = millis();
   myservo.write(LockingValue); 
   LockState=0;
-  delay(50);
- // myservo.detach();
+  delay(300);
  }
 void Lockopen(){
   myservo.attach(9); //servo connected on pin 9
-  delay(50);
   Serial.println("Lock opened");
   previousMillis = millis();
   myservo.write(UnLockingValue);
   LockState=1; 
-  delay(50);
- // myservo.detach();
+  delay(300);
 }
 
 
