@@ -22,7 +22,7 @@ unsigned int LockingValue=0, UnLockingValue=0;
 unsigned int sensorValue=0, sensorLevel=0;
 uint8_t angle;
 long previousMillis = 0;
-long Unlocktime=655350;
+long Unlocktime=10000;
   
 
 void setup()
@@ -68,9 +68,9 @@ void setup()
           myservo.detach(); 
     }
 
-    if (LockState ==1 && currentMillis - previousMillis >=Unlocktime) { 
+    if (LockState ==1 && (currentMillis - previousMillis) >=Unlocktime) { 
         Lockclose(); 
-        LockCharacteristic.setValue(LockState+'0');
+        LockCharacteristic.setValue(LockState);
         Serial.println(LockState);
     }
   /*  sensorValue = analogRead(A0);
@@ -111,7 +111,7 @@ void LockCharacteristicWritten(BLECentral& central, BLECharacteristic& character
    // central wrote new value to characteristic, update LOCK
    //0 is lock close and 1 is lock open
   Serial.print("Characteristic event, written: ");
-  if(LockCharacteristic.value()=='1'){
+  if(LockCharacteristic.value()==1){
     Lockopen();
   }
   else{
@@ -121,11 +121,11 @@ void LockCharacteristicWritten(BLECentral& central, BLECharacteristic& character
 void CalibCharacteristicWritten(BLECentral& central, BLECharacteristic& characteristic){
   // central wrote new value to characteristic, update calibration
   Serial.print("Characteristic event calibration, written: ");
-  if(CalibCharacteristic.value()=='1'){
+  if(CalibCharacteristic.value()==1){
     Serial.println("Calibrated locklevel");
     updateLockLevel();//calibrate pot value for lock level   
   }
-  else if(CalibCharacteristic.value()=='2'){
+  else if(CalibCharacteristic.value()==2){
      Serial.println("Calibrated unlocklevel");
      updateUnlockLevel();//calibrate pot value for unlock level
   }
